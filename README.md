@@ -26,5 +26,4 @@ If the columns are not called `text` and `label`, add
 - Exact package versions are in `requirements.txt`.
 
 ## AI use disclosure
-Parts of the code and README were drafted with an AI assistant (Claude, Anthropic).
-I reviewed, ran and can explain all of it.
+Parts of the code and README were drafted with an AI assistants .
