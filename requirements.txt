@@ -1,4 +1,10 @@
-pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.5.1
-openpyxl==3.1.5
+# Colab already has torch. Pin versions you actually ran with `pip freeze` before submitting.
+numpy
+pandas
+scikit-learn
+datasets
+sentence-transformers
+transformers>=4.51
+accelerate
+bitsandbytes
+openpyxl

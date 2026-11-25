@@ -1,0 +1,116 @@
+% Milestone 1 report draft, max 2 pages (references excluded only if the course allows; check the brief).
+% Use the official ACL template: Overleaf "ACL Rolling Review" template, copy acl.sty and acl_natbib.bst here.
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+\usepackage{times,latexsym,booktabs}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\title{Faithful Explanations for Code-Switched Sentiment Analysis: Milestone 1}
+\author{Mahmoud \\ German International University \\ \texttt{email}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+LLM self-explanations can look convincing without reflecting what drove the prediction. We study
+whether this holds for Egyptian Arabic--English code-switched sentiment, comparing LLM
+self-explanations with Integrated Gradients (IG) on a fine-tuned encoder using erasure-based
+faithfulness scores. This draft describes the pipeline and baselines; \textbf{all numbers are TBD
+and the data are currently a stand-in corpus}, to be replaced by EESA.
+\end{abstract}
+
+\section{Introduction and research question}
+Self-explanations produced by LLMs are often judged by their plausibility to humans, not by
+whether they reflect the evidence the model used \citep{jacovi2020faithfully,turpin2023language}.
+Prior work compares extractive self-explanations with human rationales in several text
+classification tasks \citep{brandl2024systematic} and tests explanation faithfulness for emotion
+detection in Persian \citep{mehrazar2026faithfully}, but code-switched input, where the language of
+the explanation is itself a design choice, is unexamined. \textbf{RQ:} How faithful are LLM
+self-explanations and gradient-based attributions on code-switched sentiment data, and does
+rationale-supervised training improve faithfulness?
+
+\section{Related work}
+\citet{brandl2024systematic} find that agreement between LLM rationales and human rationales
+depends on text length and task, and that post-hoc attributions often highlight structural tokens.
+\citet{mehrazar2026faithfully} study Predict-then-Explain versus Explain-then-Predict prompting in
+Persian and find explanations often diverge from faithful reasoning. \citet{turpin2023language} and
+\citet{lanham2023measuring} show unfaithful chain-of-thought explanations, and
+\citet{jain2019attention} argue that attention weights are not explanations.
+\citet{jacovi2020faithfully} argue faithfulness must be evaluated separately from plausibility.
+\citet{sundararajan2017axiomatic} introduce Integrated Gradients, and \citet{deyoung2020eraser}
+define the erasure-based comprehensiveness and sufficiency scores we use.
+
+\section{Data}
+\textbf{Target corpus:} EESA (provided by the course; licence TBD). \textbf{Stand-in (current):}
+ArSAS Arabic tweets (Hugging Face \texttt{arbml/ArSAS}; licence to be checked on the dataset card),
+three classes (negative, neutral, positive), 80/10/10 stratified split, seed 42, URLs and user
+mentions removed, duplicates dropped. Statistics (rows, label counts, share of sentences mixing
+Arabic and Latin script, length) are written by \texttt{src/data.py}: TBD.
+Annotator agreement: 50 test sentences are annotated with rationale words by one annotator;
+a second annotator is not available in Milestone 1 (limitation).
+
+\section{Baselines}
+Three types, two models each, all runnable on a free Colab T4:
+\textbf{embeddings} (multilingual-e5-base, BGE-M3, frozen, logistic regression);
+\textbf{fine-tuned encoders} (MARBERTv2 \citep{abdulmageed2021arbert}, AraBERTv02-twitter);
+\textbf{zero-shot LLMs} in 4-bit (Qwen2.5-7B-Instruct, Qwen3-8B), where the label is the
+highest next-token probability among the label words. Metrics: accuracy and macro-F1.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{llcc}\toprule
+Type & Model & Acc. & Macro-F1\\\midrule
+Embedding & multilingual-e5-base & TBD & TBD\\
+Embedding & BGE-M3 & TBD & TBD\\
+Encoder & MARBERTv2 & TBD & TBD\\
+Encoder & AraBERTv02-twitter & TBD & TBD\\
+LLM & Qwen2.5-7B-Instruct & TBD & TBD\\
+LLM & Qwen3-8B & TBD & TBD\\\bottomrule
+\end{tabular}\caption{Test results (not yet run).}
+\end{table}
+
+\section{Limitation experiment: faithfulness}
+For each sentence the LLM predicts a label and lists up to five words that influenced it. Using the
+LLM's own probability $p$ of the predicted label, comprehensiveness is $p(x)-p(x\setminus R)$ and
+sufficiency is $p(x)-p(R)$ \citep{deyoung2020eraser}, where $R$ is the explanation word set; a random set of the same
+size is the control. For the fine-tuned encoder we compute IG on the input embeddings
+\citep{sundararajan2017axiomatic} (32 steps, all-PAD baseline, token scores summed to words, completeness
+error reported) and apply the same erasure test to the top-$k$ words, with $k$ equal to the human
+rationale length. Both are also compared to the human rationales (word-level F1).
+\textbf{Hypothesis:} LLM explanations score as plausible but have lower comprehensiveness than IG.
+Results: TBD.
+
+\section{Method v1 and plan}
+Method v1 (rationale-supervised fine-tuning with an attribution-alignment loss on the 50 rationales
+plus a larger pseudo-rationale set) is planned, not implemented. Next: run all baselines on
+EESA, finish human rationales, report erasure scores with confidence intervals, test explanation
+language (Arabic vs.\ English) as a design choice.
+
+\section*{Limitations and AI use}
+Single annotator, small rationale set, stand-in data until EESA is used. AI assistants (Claude) were
+used for code and drafting; the author reviewed and takes responsibility. References were checked
+by opening their source pages.
+
+\bibliographystyle{acl_natbib}
+\begin{thebibliography}{9}
+\bibitem[Abdul-Mageed et~al.(2021)]{abdulmageed2021arbert}
+Muhammad Abdul-Mageed, AbdelRahim Elmadany, and El~Moatez Billah Nagoudi. 2021.
+ARBERT \& MARBERT: Deep bidirectional transformers for Arabic. In \emph{Proc.\ ACL-IJCNLP}, pages 7088--7105.
+\bibitem[Brandl and Eberle(2024)]{brandl2024systematic}
+Stephanie Brandl and Oliver Eberle. 2024. A systematic comparison between extractive self-explanations and human rationales in text classification. arXiv:2410.03296.
+\bibitem[DeYoung et~al.(2020)]{deyoung2020eraser}
+Jay DeYoung, Sarthak Jain, Nazneen~Fatema Rajani, Eric Lehman, Caiming Xiong, Richard Socher, and Byron~C. Wallace. 2020. ERASER: A benchmark to evaluate rationalized NLP models. In \emph{Proc.\ ACL}, pages 4443--4458.
+\bibitem[Jacovi and Goldberg(2020)]{jacovi2020faithfully}
+Alon Jacovi and Yoav Goldberg. 2020. Towards faithfully interpretable NLP systems: How should we define and evaluate faithfulness? In \emph{Proc.\ ACL}, pages 4198--4205.
+\bibitem[Jain and Wallace(2019)]{jain2019attention}
+Sarthak Jain and Byron~C. Wallace. 2019. Attention is not explanation. arXiv:1902.10186.
+\bibitem[Lanham et~al.(2023)]{lanham2023measuring}
+Tamera Lanham et~al. 2023. Measuring faithfulness in chain-of-thought reasoning. arXiv:2307.13702.
+\bibitem[Mehrazar et~al.(2026)]{mehrazar2026faithfully}
+Mobina Mehrazar, Mohammad~Amin Yousefi, Parisa Beygi, and Behnam Bahrak. 2026. Can LLMs faithfully explain themselves in low-resource languages? A case study on emotion detection in Persian. In \emph{Proc.\ LREC}, pages 560--579.
+\bibitem[Sundararajan et~al.(2017)]{sundararajan2017axiomatic}
+Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic attribution for deep networks. arXiv:1703.01365 (ICML 2017).
+\bibitem[Turpin et~al.(2023)]{turpin2023language}
+Miles Turpin, Julian Michael, Ethan Perez, and Samuel~R. Bowman. 2023. Language models don't always say what they think: Unfaithful explanations in chain-of-thought prompting. arXiv:2305.04388.
+\end{thebibliography}
+\end{document}
