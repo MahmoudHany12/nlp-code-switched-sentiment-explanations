@@ -60,12 +60,11 @@ Or open `notebooks/run_all_colab.ipynb` on a free Colab T4. Results go to `resul
 | Explanation | Comprehensiveness (random) | Sufficiency (random) | F1 vs rationales |
 |---|---|---|---|
 | Qwen3-1.7B self-explanation | .282 (.363) | .336 (.359) | .410 |
-| IG on MARBERTv2 | .178 (.059) | .163 (.293) | .351 |
-| IG on AraBERT | .167 (.059) | .072 (.259) | .464 |
+| IG on MARBERTv2 | .245 (.083) | .116 (.228) | .388 |
+| IG on AraBERT | .213 (.094) | .047 (.236) | .469 |
 
 Reading: IG words matter to the encoder much more than random words; the small LLM's self-explanations do not beat random words.
 Caveats: n=50, one run, different models are not directly comparable, single annotator (no agreement score).
-F1 uses the final rationales (`src/rescore_rationale_f1.py`, no model re-run). IG top-k still uses the rationale lengths of an earlier rationale version, so the IG erasure scores use those lengths; re-run `src/ig_encoder.py` to update them.
 
 ## Status and limits (honest)
 - No GPU was available: LLMs are small (1.5-1.7B); 7-8B models are untested. Method v1 (rationale-supervised training) is not implemented.

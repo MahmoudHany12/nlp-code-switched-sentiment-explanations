@@ -4,10 +4,9 @@
   "ig_steps": 32,
   "human_rationales": true,
   "mean_abs_completeness_error": 0.1032,
-  "comprehensiveness": 0.1667,
-  "comprehensiveness_random": 0.0586,
-  "sufficiency": 0.0723,
-  "sufficiency_random": 0.2589,
-  "human_token_f1": 0.4638,
-  "rationales_version": "v2"
+  "comprehensiveness": 0.2125,
+  "comprehensiveness_random": 0.0943,
+  "sufficiency": 0.0473,
+  "sufficiency_random": 0.2361,
+  "human_token_f1": 0.4689
 }
