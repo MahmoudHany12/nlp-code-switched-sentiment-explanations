@@ -8,5 +8,6 @@
   "comprehensiveness_random": 0.0589,
   "sufficiency": 0.1626,
   "sufficiency_random": 0.2928,
-  "human_token_f1": 0.3234
+  "human_token_f1": 0.3509,
+  "rationales_version": "reviewed (v2)"
 }

@@ -8,8 +8,9 @@ faithfulness?
 
 > **Data:** EESA (Sherif and Sabty, github.com/ASTalaat/EESA-Corpus, 4,100 Egyptian Arabic-English
 > code-switched comments, official train/dev/test files). The repo states no licence: coursework use, cite the source.
-> **Rationales:** `data/rationales/rationales.csv` is an **AI-assisted draft (Claude), not yet reviewed by the author.**
-> Review it and correct the `rationale_words` column before relying on the faithfulness numbers.
+> **Rationales:** `data/rationales/rationales.csv` started as an AI-assisted first draft (Claude) and was then
+> reviewed, audited and revised by the author (Mahmoud) together with classmates (35 of 50 rationales changed;
+> 3 sentences were judged neutral by the reviewers, while EESA's gold labels are kept for all classification results).
 > **Compute:** results below were produced on a 4-core CPU machine (no GPU), so the LLMs are small.
 
 ## What each part does (one line each)
@@ -38,7 +39,7 @@ python src/baselines_encoder.py --model UBC-NLP/MARBERTv2
 python src/baselines_encoder.py --model aubmindlab/bert-base-arabertv02-twitter
 python src/baselines_llm.py --model Qwen/Qwen2.5-1.5B-Instruct --n 200
 python src/baselines_llm.py --model Qwen/Qwen3-1.7B --n 200   # on a GPU use Qwen2.5-7B-Instruct / Qwen3-8B
-python src/make_rationale_template.py --n 50      # already done; draft in data/rationales/rationales.csv
+python src/make_rationale_template.py --n 50      # already done; reviewed rationales in data/rationales/rationales.csv
 python src/explain_llm.py --model Qwen/Qwen3-1.7B --n 50
 python src/ig_encoder.py --model-dir models/MARBERTv2 --n 50 --steps 32
 python src/ig_encoder.py --model-dir models/bert-base-arabertv02-twitter --n 50 --steps 32
@@ -57,14 +58,15 @@ Or open `notebooks/run_all_colab.ipynb` on a free Colab T4. Results go to `resul
 | Qwen2.5-1.5B-Instruct | zero-shot LLM (200 sent.) | .625 | .584 |
 | Qwen3-1.7B | zero-shot LLM (200 sent.) | .710 | .672 |
 
-| Explanation | Comprehensiveness (random) | Sufficiency (random) | F1 vs draft rationales |
+| Explanation | Comprehensiveness (random) | Sufficiency (random) | F1 vs rationales |
 |---|---|---|---|
-| Qwen3-1.7B self-explanation | .282 (.363) | .336 (.359) | .379 |
-| IG on MARBERTv2 | .178 (.059) | .163 (.293) | .323 |
-| IG on AraBERT | .167 (.059) | .072 (.259) | .525 |
+| Qwen3-1.7B self-explanation | .282 (.363) | .336 (.359) | .410 |
+| IG on MARBERTv2 | .178 (.059) | .163 (.293) | .351 |
+| IG on AraBERT | .167 (.059) | .072 (.259) | .464 |
 
 Reading: IG words matter to the encoder much more than random words; the small LLM's self-explanations do not beat random words.
-Caveats: n=50, one run, different models are not directly comparable, rationales are an AI draft.
+Caveats: n=50, one run, different models are not directly comparable, rationales were AI-drafted, then reviewed, audited and revised by the author with classmates (no formal agreement score).
+F1 uses the reviewed rationales (`src/rescore_rationale_f1.py`, no model re-run). IG top-k still uses the draft rationale lengths, so the IG erasure scores are from the draft; re-run `src/ig_encoder.py` to update them.
 
 ## Status and limits (honest)
 - No GPU was available: LLMs are small (1.5-1.7B); 7-8B models are untested. Method v1 (rationale-supervised training) is not implemented.
@@ -73,6 +75,6 @@ Caveats: n=50, one run, different models are not directly comparable, rationales
 - ArSAS stand-in code remains (`--source arsas`) but was not used for any reported number.
 
 ## AI use disclosure
-Parts of the code and README were drafted with an AI assistants .
+Parts of the code and README were drafted with an AI assistant (Claude).
 The report draft was also drafted with AI assistance; references were checked by opening their source pages.
-The experiments were also run by the AI assistant, and the 50 rationales in `data/rationales/rationales.csv` are its draft (column `source`); the author must review them (column `reviewed`).
+The experiments were also run by the AI assistant, and the 50 rationales in `data/rationales/rationales.csv` were first drafted by it and then reviewed, audited and revised by the author with classmates (columns `source` and `reviewed`).
