@@ -1,0 +1,11 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "n_items_total": 50,
+  "n_items_with_usable_explanation": 50,
+  "human_rationales": true,
+  "comprehensiveness": 0.2822,
+  "comprehensiveness_random": 0.363,
+  "sufficiency": 0.3357,
+  "sufficiency_random": 0.3588,
+  "human_token_f1": 0.3786
+}

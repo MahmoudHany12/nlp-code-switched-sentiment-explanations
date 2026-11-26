@@ -16,8 +16,7 @@
 LLM self-explanations can look convincing without reflecting what drove the prediction. We study
 whether this holds for Egyptian Arabic--English code-switched sentiment, comparing LLM
 self-explanations with Integrated Gradients (IG) on a fine-tuned encoder using erasure-based
-faithfulness scores. This draft describes the pipeline and baselines; \textbf{all numbers are TBD
-and the data are currently a stand-in corpus}, to be replaced by EESA.
+faithfulness scores. On EESA, fine-tuned encoders reach 0.88 macro-F1, and in a small CPU-scale study (50 sentences) Integrated Gradients is more faithful than a small LLM's self-explanations, which are no better than random words. Results are preliminary: one run, small models, AI-drafted rationales.
 \end{abstract}
 
 \section{Introduction and research question}
@@ -42,31 +41,33 @@ Persian and find explanations often diverge from faithful reasoning. \citet{turp
 define the erasure-based comprehensiveness and sufficiency scores we use.
 
 \section{Data}
-\textbf{Target corpus:} EESA (provided by the course; licence TBD). \textbf{Stand-in (current):}
-ArSAS Arabic tweets (Hugging Face \texttt{arbml/ArSAS}; licence to be checked on the dataset card),
-three classes (negative, neutral, positive), 80/10/10 stratified split, seed 42, URLs and user
-mentions removed, duplicates dropped. Statistics (rows, label counts, share of sentences mixing
-Arabic and Latin script, length) are written by \texttt{src/data.py}: TBD.
-Annotator agreement: 50 test sentences are annotated with rationale words by one annotator;
-a second annotator is not available in Milestone 1 (limitation).
+\textbf{EESA} \citep{sherif2024eesa} contains 4,100 Egyptian Arabic--English code-switched YouTube comments with
+three sentiment labels, released with official train/dev/test files on GitHub
+(\texttt{ASTalaat/EESA-Corpus}). The repository states no licence, so we use it for coursework only and cite the source.
+\textbf{Pipeline} (\texttt{src/data.py}): URLs, user mentions and diacritics removed, duplicates dropped inside and across splits
+(2,463 / 817 / 816 sentences after cleaning). Labels (train): 1,092 positive, 777 neutral, 594 negative. Mean length 12.6 words;
+all sentences mix Arabic and Latin script by our script heuristic. Seed 42.
+\textbf{Rationales:} for 50 test sentences (random, seed 42) we marked the words that justify the label.
+\textbf{These 50 rationales are an AI-assisted draft (Claude) and are not yet reviewed by the author}; no second annotator
+exists, so no agreement is reported (limitation).
 
 \section{Baselines}
-Three types, two models each, all runnable on a free Colab T4:
+Three types, two models each. The cloud machine used had no GPU, so the LLMs are small (4 CPU cores); larger models need a Colab T4:
 \textbf{embeddings} (multilingual-e5-base, BGE-M3, frozen, logistic regression);
 \textbf{fine-tuned encoders} (MARBERTv2 \citep{abdulmageed2021arbert}, AraBERTv02-twitter);
-\textbf{zero-shot LLMs} in 4-bit (Qwen2.5-7B-Instruct, Qwen3-8B), where the label is the
-highest next-token probability among the label words. Metrics: accuracy and macro-F1.
+\textbf{zero-shot LLMs} (Qwen2.5-1.5B-Instruct, Qwen3-1.7B; 200 test sentences), where the label is the
+highest next-token probability among the label words. Metrics: accuracy and macro-F1 on the test set (one run, seed 42).
 
 \begin{table}[h]\centering\small
 \begin{tabular}{llcc}\toprule
 Type & Model & Acc. & Macro-F1\\\midrule
-Embedding & multilingual-e5-base & TBD & TBD\\
-Embedding & BGE-M3 & TBD & TBD\\
-Encoder & MARBERTv2 & TBD & TBD\\
-Encoder & AraBERTv02-twitter & TBD & TBD\\
-LLM & Qwen2.5-7B-Instruct & TBD & TBD\\
-LLM & Qwen3-8B & TBD & TBD\\\bottomrule
-\end{tabular}\caption{Test results (not yet run).}
+Embedding & multilingual-e5-base & .824 & .812\\
+Embedding & BGE-M3 & .830 & .817\\
+Encoder & MARBERTv2 & .887 & .880\\
+Encoder & AraBERTv02-twitter & .876 & .871\\
+LLM & Qwen2.5-1.5B-Instruct & .625 & .584\\
+LLM & Qwen3-1.7B & .710 & .672\\\bottomrule
+\end{tabular}\caption{Test results on EESA (LLMs: 200 sentences).}
 \end{table}
 
 \section{Limitation experiment: faithfulness}
@@ -77,18 +78,30 @@ size is the control. For the fine-tuned encoder we compute IG on the input embed
 \citep{sundararajan2017axiomatic} (32 steps, all-PAD baseline, token scores summed to words, completeness
 error reported) and apply the same erasure test to the top-$k$ words, with $k$ equal to the human
 rationale length. Both are also compared to the human rationales (word-level F1).
-\textbf{Hypothesis:} LLM explanations score as plausible but have lower comprehensiveness than IG.
-Results: TBD.
+Table~2 shows results on the 50 sentences (random = same-size random word set). IG on both encoders removes much more
+confidence than random words (comprehensiveness .18/.17 vs .06) and the top words alone preserve more
+(sufficiency .16/.07 vs .29/.26). The Qwen3-1.7B self-explanations are \emph{not} better than random: erasing
+them drops confidence by .28 versus .36 for random words, and keeping only them preserves .34 versus .36.
+Agreement with the (draft) human rationales is higher for AraBERT-IG (.53 F1) than for the LLM (.38). Caveats: the LLM and the encoders
+are different models, so scores are not directly comparable; one run; $n{=}50$; no confidence intervals yet.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{lccccc}\toprule
+ & Comp.$\uparrow$ & (rand) & Suff.$\downarrow$ & (rand) & F1\\\midrule
+Qwen3-1.7B self-expl. & .282 & .363 & .336 & .359 & .379\\
+IG MARBERTv2 & .178 & .059 & .163 & .293 & .323\\
+IG AraBERT & .167 & .059 & .072 & .259 & .525\\\bottomrule
+\end{tabular}\caption{Erasure faithfulness and word-level F1 with the human-rationale draft.}
+\end{table}
 
 \section{Method v1 and plan}
-Method v1 (rationale-supervised fine-tuning with an attribution-alignment loss on the 50 rationales
-plus a larger pseudo-rationale set) is planned, not implemented. Next: run all baselines on
-EESA, finish human rationales, report erasure scores with confidence intervals, test explanation
-language (Arabic vs.\ English) as a design choice.
+Method v1 (rationale-supervised fine-tuning with an attribution-alignment loss on the rationales) is planned, not implemented.
+Next: review the rationales, run larger LLMs (7--8B, 4-bit) on a GPU, add confidence intervals and several seeds,
+test explanation language (Arabic vs.\ English) as a design choice.
 
 \section*{Limitations and AI use}
-Single annotator, small rationale set, stand-in data until EESA is used. AI assistants (Claude) were
-used for code and drafting; the author reviewed and takes responsibility. References were checked
+No second annotator; the 50 rationales are an AI-assisted draft pending the author's review; small CPU-scale models;
+one run. AI assistants (Claude) were used for code, running experiments, rationale drafting and writing; the author takes responsibility. References were checked
 by opening their source pages.
 
 \bibliographystyle{acl_natbib}
@@ -108,6 +121,8 @@ Sarthak Jain and Byron~C. Wallace. 2019. Attention is not explanation. arXiv:190
 Tamera Lanham et~al. 2023. Measuring faithfulness in chain-of-thought reasoning. arXiv:2307.13702.
 \bibitem[Mehrazar et~al.(2026)]{mehrazar2026faithfully}
 Mobina Mehrazar, Mohammad~Amin Yousefi, Parisa Beygi, and Behnam Bahrak. 2026. Can LLMs faithfully explain themselves in low-resource languages? A case study on emotion detection in Persian. In \emph{Proc.\ LREC}, pages 560--579.
+\bibitem[Sherif and Sabty(2024)]{sherif2024eesa}
+Ahmed Sherif and Caroline Sabty. 2024. Sentiment analysis for Egyptian Arabic-English code-switched text (EESA corpus), SPECOM 2024; data: github.com/ASTalaat/EESA-Corpus.
 \bibitem[Sundararajan et~al.(2017)]{sundararajan2017axiomatic}
 Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic attribution for deep networks. arXiv:1703.01365 (ICML 2017).
 \bibitem[Turpin et~al.(2023)]{turpin2023language}

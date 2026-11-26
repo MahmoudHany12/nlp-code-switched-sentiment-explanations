@@ -1,0 +1,12 @@
+{
+  "model_dir": "models/MARBERTv2",
+  "n_items": 50,
+  "ig_steps": 32,
+  "human_rationales": true,
+  "mean_abs_completeness_error": 0.0289,
+  "comprehensiveness": 0.1782,
+  "comprehensiveness_random": 0.0589,
+  "sufficiency": 0.1626,
+  "sufficiency_random": 0.2928,
+  "human_token_f1": 0.3234
+}

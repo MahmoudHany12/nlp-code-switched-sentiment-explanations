@@ -1,0 +1,12 @@
+{
+  "model_dir": "models/bert-base-arabertv02-twitter",
+  "n_items": 50,
+  "ig_steps": 32,
+  "human_rationales": true,
+  "mean_abs_completeness_error": 0.1032,
+  "comprehensiveness": 0.1667,
+  "comprehensiveness_random": 0.0586,
+  "sufficiency": 0.0723,
+  "sufficiency_random": 0.2589,
+  "human_token_f1": 0.525
+}
