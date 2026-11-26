@@ -45,6 +45,8 @@ python src/ig_encoder.py --model-dir models/bert-base-arabertv02-twitter --n 50 
 ```
 Or open `notebooks/run_all_colab.ipynb` on a free Colab T4. Results go to `results/*.json`.
 
+**Report:** `report/report.tex` (ACL style files included; `cd report && pdflatex report.tex`, or upload the `report/` folder to Overleaf).
+
 ## Results (EESA test set, one run, seed 42; files in `results/`)
 | Model | Type | Acc. | Macro-F1 |
 |---|---|---|---|

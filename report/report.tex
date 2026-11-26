@@ -1,13 +1,13 @@
-% Milestone 1 report draft, max 2 pages (references excluded only if the course allows; check the brief).
-% Use the official ACL template: Overleaf "ACL Rolling Review" template, copy acl.sty and acl_natbib.bst here.
+% Milestone 1 report, max 2 pages. ACL style files (acl.sty, acl_natbib.bst) are in this folder:
+% compile with pdflatex, or upload the whole report/ folder to Overleaf.
 \documentclass[11pt]{article}
-\usepackage[review]{acl}
+\usepackage{acl}
 \usepackage{times,latexsym,booktabs}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
 \title{Faithful Explanations for Code-Switched Sentiment Analysis: Milestone 1}
-\author{Mahmoud \\ German International University \\ \texttt{email}}
+\author{Mahmoud \\ German International University}
 
 \begin{document}
 \maketitle
@@ -43,7 +43,7 @@ define the erasure-based comprehensiveness and sufficiency scores we use.
 \section{Data}
 \textbf{EESA} \citep{sherif2024eesa} contains 4,100 Egyptian Arabic--English code-switched YouTube comments with
 three sentiment labels, released with official train/dev/test files on GitHub
-(\texttt{ASTalaat/EESA-Corpus}). The repository states no licence, so we use it for coursework only and cite the source.
+(\texttt{ASTalaat/\allowbreak EESA-Corpus}). The repository states no licence, so we use it for coursework only and cite the source.
 \textbf{Pipeline} (\texttt{src/data.py}): URLs, user mentions and diacritics removed, duplicates dropped inside and across splits
 (2,463 / 817 / 816 sentences after cleaning). Labels (train): 1,092 positive, 777 neutral, 594 negative. Mean length 12.6 words;
 all sentences mix Arabic and Latin script by our script heuristic. Seed 42.
@@ -85,7 +85,7 @@ them drops confidence by .28 versus .36 for random words, and keeping only them 
 Agreement with the (draft) human rationales is higher for AraBERT-IG (.53 F1) than for the LLM (.38). Caveats: the LLM and the encoders
 are different models, so scores are not directly comparable; one run; $n{=}50$; no confidence intervals yet.
 
-\begin{table}[h]\centering\small
+\begin{table}[h]\centering\small\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lccccc}\toprule
  & Comp.$\uparrow$ & (rand) & Suff.$\downarrow$ & (rand) & F1\\\midrule
 Qwen3-1.7B self-expl. & .282 & .363 & .336 & .359 & .379\\
@@ -105,6 +105,7 @@ one run. AI assistants (Claude) were used for code, running experiments, rationa
 by opening their source pages.
 
 \bibliographystyle{acl_natbib}
+\begingroup\small\setlength{\bibsep}{1pt}
 \begin{thebibliography}{9}
 \bibitem[Abdul-Mageed et~al.(2021)]{abdulmageed2021arbert}
 Muhammad Abdul-Mageed, AbdelRahim Elmadany, and El~Moatez Billah Nagoudi. 2021.
@@ -128,4 +129,5 @@ Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic attribution for d
 \bibitem[Turpin et~al.(2023)]{turpin2023language}
 Miles Turpin, Julian Michael, Ethan Perez, and Samuel~R. Bowman. 2023. Language models don't always say what they think: Unfaithful explanations in chain-of-thought prompting. arXiv:2305.04388.
 \end{thebibliography}
+\endgroup
 \end{document}
