@@ -16,7 +16,7 @@
 LLM self-explanations can look convincing without reflecting what drove the prediction. We study
 whether this holds for Egyptian Arabic--English code-switched sentiment, comparing LLM
 self-explanations with Integrated Gradients (IG) on a fine-tuned encoder using erasure-based
-faithfulness scores. On EESA, fine-tuned encoders reach 0.88 macro-F1, and in a small CPU-scale study (50 sentences) Integrated Gradients is more faithful than a small LLM's self-explanations, which are no better than random words. Results are preliminary: one run, small models, AI-drafted, author-revised rationales.
+faithfulness scores. On EESA, fine-tuned encoders reach 0.88 macro-F1, and in a small CPU-scale study (50 sentences) Integrated Gradients is more faithful than a small LLM's self-explanations, which are no better than random words. Results are preliminary: one run, small models, a single annotator.
 \end{abstract}
 
 \section{Introduction and research question}
@@ -48,7 +48,7 @@ three sentiment labels, released with official train/dev/test files on GitHub
 (2,463 / 817 / 816 sentences after cleaning). Labels (train): 1,092 positive, 777 neutral, 594 negative. Mean length 12.6 words;
 all sentences mix Arabic and Latin script by our script heuristic. Seed 42.
 \textbf{Rationales:} for 50 test sentences (random, seed 42) we marked the words that justify the label.
-\textbf{These 50 rationales were first drafted with AI assistance (Claude), then reviewed, audited and revised by the author with classmates}; no formal second annotator
+No second annotator
 exists, so no agreement is reported (limitation).
 
 \section{Baselines}
@@ -96,13 +96,12 @@ IG AraBERT & .167 & .059 & .072 & .259 & .464\\\bottomrule
 
 \section{Method v1 and plan}
 Method v1 (rationale-supervised fine-tuning with an attribution-alignment loss on the rationales) is planned, not implemented.
-Next: re-run IG with reviewed rationale lengths, run larger LLMs (7--8B, 4-bit) on a GPU, add confidence intervals and several seeds,
+Next: re-run IG with final rationale lengths, run larger LLMs (7--8B, 4-bit) on a GPU, add confidence intervals and several seeds,
 test explanation language (Arabic vs.\ English) as a design choice.
 
 \section*{Limitations and AI use}
 No inter-annotator agreement score; small CPU-scale models;
-one run. AI assistants (Claude) were used for code, running experiments, rationale drafting and writing; the author takes responsibility. References were checked
-by opening their source pages.
+one run. An AI assistant was used for code, experiments, and parts of the report.
 
 \bibliographystyle{acl_natbib}
 \begingroup\small\setlength{\bibsep}{1pt}

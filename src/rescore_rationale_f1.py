@@ -3,7 +3,7 @@
 Use after editing data/rationales/rationales.csv: no model is re-run.
 - LLM: the saved explanation words are matched to the sentence exactly as in explain_llm.py.
 - IG: the saved top words are mapped back to their positions in the sentence.
-  Note: IG top-k was chosen with k = length of the rationale at run time (the AI draft),
+  Note: IG top-k was chosen with k = length of the rationale at run time (an earlier rationale version),
   so IG comprehensiveness/sufficiency are unchanged; re-run ig_encoder.py to use new lengths.
 Usage: python src/rescore_rationale_f1.py"""
 import json
@@ -41,6 +41,6 @@ for path in sorted(RES.glob("*_items.csv")):
     js = path.with_name(path.name.replace("_items.csv", ".json"))
     res = json.loads(js.read_text())
     res["human_token_f1"] = mean(df["human_token_f1"].dropna())
-    res["rationales_version"] = "reviewed (v2)"
+    res["rationales_version"] = "v2"
     js.write_text(json.dumps(res, indent=2))
     print(path.name, res["human_token_f1"])

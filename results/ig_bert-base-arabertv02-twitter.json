@@ -9,5 +9,5 @@
   "sufficiency": 0.0723,
   "sufficiency_random": 0.2589,
   "human_token_f1": 0.4638,
-  "rationales_version": "reviewed (v2)"
+  "rationales_version": "v2"
 }
