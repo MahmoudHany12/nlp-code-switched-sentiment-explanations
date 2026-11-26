@@ -13,6 +13,8 @@ def load_llm(name: str, four_bit: bool = True):
     elif torch.cuda.is_available():
         kw["torch_dtype"] = torch.float16
         kw["device_map"] = "auto"
+    else:   # CPU run (small models only)
+        kw["torch_dtype"] = torch.float32
     tok = AutoTokenizer.from_pretrained(name)
     model = AutoModelForCausalLM.from_pretrained(name, **kw).eval()
     return tok, model

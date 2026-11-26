@@ -1,0 +1,7 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "type": "zero-shot LLM",
+  "n_test": 200,
+  "test_accuracy": 0.71,
+  "test_macro_f1": 0.6718
+}

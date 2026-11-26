@@ -1,6 +1,7 @@
 """Load, clean and split a sentiment corpus; print statistics.
 
 Sources:
+  --source eesa    EESA corpus, official train/dev/test files (--eesa-dir <folder with EESA-*.csv>)
   --source arsas   public Arabic tweet sentiment corpus (STAND-IN, downloaded from Hugging Face)
   --source csv     your own file, e.g. EESA:  --input data/raw/eesa.csv --text-col X --label-col Y
 
@@ -59,14 +60,45 @@ def stats(df: pd.DataFrame) -> dict:
             "words_mean": round(float(words.mean()), 2), "words_max": int(words.max())}
 
 
+def main_eesa(args) -> None:
+    """EESA ships official splits (CSV, NO header: comment, sentiment). We keep them, clean text,
+    drop duplicates inside and across splits (priority train > dev > test) so nothing leaks."""
+    set_seed(args.seed)
+    parts, seen, report = {}, set(), {"source": "eesa", "seed": args.seed}
+    for name, f in [("train", "EESA-Train"), ("dev", "EESA-Dev"), ("test", "EESA-Test")]:
+        df = pd.read_csv(Path(args.eesa_dir) / f"{f}.csv", header=None, names=["text", "label"]).dropna()
+        n_raw = len(df)
+        df["text"] = df["text"].map(clean_text)
+        df["label"] = df["label"].astype(str).str.strip().str.lower()
+        df = df[df["text"].str.len() > 0].drop_duplicates(subset="text")
+        df = df[~df["text"].isin(seen)]
+        seen |= set(df["text"])
+        df["script"] = df["text"].map(script_type)
+        parts[name] = df.reset_index(drop=True)
+        report[name + "_raw_rows"] = n_raw
+    allx = pd.concat(parts.values())
+    ids = iter(range(len(allx)))
+    DATA.mkdir(parents=True, exist_ok=True)
+    for name, part in parts.items():
+        part.insert(0, "id", [next(ids) for _ in range(len(part))])
+        part.to_csv(DATA / f"{name}.csv", index=False)
+    (DATA / "labels.json").write_text(json.dumps(sorted(allx["label"].unique())))
+    report.update({k: stats(v) for k, v in parts.items()})
+    (DATA / "stats.json").write_text(json.dumps(report, indent=2, ensure_ascii=False))
+    print(json.dumps(report, indent=2, ensure_ascii=False))
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--source", choices=["arsas", "csv"], default="arsas")
+    p.add_argument("--source", choices=["eesa", "arsas", "csv"], default="eesa")
     p.add_argument("--input")
+    p.add_argument("--eesa-dir", default="data/raw/eesa-corpus")
     p.add_argument("--text-col", default="text")
     p.add_argument("--label-col", default="label")
     p.add_argument("--seed", type=int, default=SEED)
     args = p.parse_args()
+    if args.source == "eesa":
+        return main_eesa(args)
     set_seed(args.seed)
 
     df = load_raw(args)                                   # 1. load

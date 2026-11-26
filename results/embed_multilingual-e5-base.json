@@ -1,0 +1,8 @@
+{
+  "model": "intfloat/multilingual-e5-base",
+  "type": "embedding+LR",
+  "C": 10,
+  "dev_macro_f1": 0.8464,
+  "test_accuracy": 0.8235,
+  "test_macro_f1": 0.8123
+}

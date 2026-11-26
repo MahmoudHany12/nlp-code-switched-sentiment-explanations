@@ -1,0 +1,9 @@
+{
+  "model": "aubmindlab/bert-base-arabertv02-twitter",
+  "type": "fine-tuned encoder",
+  "epochs": 3,
+  "lr": 2e-05,
+  "dev_macro_f1": 0.8792,
+  "test_accuracy": 0.8762,
+  "test_macro_f1": 0.8713
+}

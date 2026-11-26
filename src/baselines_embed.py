@@ -14,6 +14,7 @@ set_seed()
 
 from sentence_transformers import SentenceTransformer
 enc = SentenceTransformer(args.model)
+enc.max_seq_length = 128
 tr, dv, te = load_split("train"), load_split("dev"), load_split("test")
 emb = lambda df: enc.encode([args.prefix + t for t in df["text"]], batch_size=64,
                             normalize_embeddings=True, show_progress_bar=True)
